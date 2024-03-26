@@ -1,1 +1,1 @@
-# Full-Stack Web Application with Axum and Leptos
+# Full-Stack Rust Web Application with Axum and Leptos
