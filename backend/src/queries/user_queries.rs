@@ -1,8 +1,8 @@
 use axum::http::StatusCode;
-use sea_orm::{ActiveModelTrait, DatabaseConnection};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 
 use crate::{
-    database::users::{self, Model as UserModel},
+    database::users::{self, Entity as Users, Model as UserModel},
     utilities::app_error::AppError,
 };
 
@@ -31,4 +31,27 @@ pub async fn save_active_user(
     })?;
 
     convert_active_to_model(user)
+}
+
+pub async fn find_by_username(
+    db: &DatabaseConnection,
+    username: String,
+) -> Result<UserModel, AppError> {
+    Users::find()
+        .filter(users::Column::Username.eq(username))
+        .one(db)
+        .await
+        .map_err(|error| {
+            eprintln!("Error getting user for logging in: {:?}", error);
+            AppError::new(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error logging in, please try again later.",
+            )
+        })?
+        .ok_or_else(|| {
+            AppError::new(
+                StatusCode::BAD_REQUEST,
+                "incorrect username and/or password",
+            )
+        })
 }
