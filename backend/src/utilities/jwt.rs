@@ -1,6 +1,6 @@
 use axum::http::StatusCode;
 use chrono::{Duration, Utc};
-use jsonwebtoken::{encode, EncodingKey, Header};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
 use super::app_error::AppError;
@@ -27,4 +27,23 @@ pub fn create_token(secret: &str, username: String) -> Result<String, AppError> 
             "There was an error, please try again.",
         )
     })
+}
+
+pub fn validate_token(secret: &str, token: &str) -> Result<bool, AppError> {
+    let key = DecodingKey::from_secret(secret.as_bytes());
+    let validation = Validation::new(Algorithm::HS256);
+
+    decode::<Claims>(token, &key, &validation)
+        .map_err(|error| match error.kind() {
+            jsonwebtoken::errors::ErrorKind::InvalidToken
+            | jsonwebtoken::errors::ErrorKind::InvalidSignature
+            | jsonwebtoken::errors::ErrorKind::ExpiredSignature => {
+                AppError::new(StatusCode::UNAUTHORIZED, "not authenticated!")
+            }
+            _ => {
+                eprintln!("Error validating token: {:?}", error);
+                AppError::new(StatusCode::INTERNAL_SERVER_ERROR, "Error validating token")
+            }
+        })
+        .map(|_| true)
 }

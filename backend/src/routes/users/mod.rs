@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 pub mod create_user;
+pub mod login;
+pub mod logout;
 
 #[derive(Serialize, Deserialize)]
 pub struct ResponseUser {

@@ -29,7 +29,7 @@ pub async fn create_user(
 
     new_user.username = Set(request_user.username.clone());
     new_user.password = Set(hash_password(&request_user.password)?);
-    new_user.token = Set(Some(create_token(&jwt_secret.0, request_user.username)?));
+    new_user.token = Set(Some(create_token(&*jwt_secret, request_user.username)?));
     let user = save_active_user(&db, new_user).await?;
 
     create_default_tasks_for_user(&db, &user).await?;
