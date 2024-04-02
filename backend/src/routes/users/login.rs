@@ -2,7 +2,11 @@ use axum::{extract::State, http::StatusCode, Json};
 use sea_orm::{DatabaseConnection, IntoActiveModel, Set};
 
 use crate::{
-    queries::user_queries::{find_by_username, save_active_user}, routes::users::ResponseUser, utilities::{app_error::AppError, hash::verify_password, jwt::create_token, token_wrapper::TokenWrapper}
+    queries::user_queries::{find_by_username, save_active_user},
+    routes::users::ResponseUser,
+    utilities::{
+        app_error::AppError, hash::verify_password, jwt::create_token, token_wrapper::TokenWrapper,
+    },
 };
 
 use super::{RequestCreateUser, ResponseDataUser};

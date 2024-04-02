@@ -3,6 +3,7 @@ use router::create_routes;
 
 pub mod app_state;
 mod database;
+mod middleware;
 mod queries;
 mod router;
 mod routes;
