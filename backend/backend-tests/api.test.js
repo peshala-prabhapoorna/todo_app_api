@@ -148,7 +148,7 @@ describe("todo api", () => {
     });
 
     describe("create a task", () => {
-      test.only("should be able to create a task", async () => {
+      test("should be able to create a task", async () => {
         const newTask = {
           priority: "A",
           title: `this is a test task - ${Date.now()}`,
