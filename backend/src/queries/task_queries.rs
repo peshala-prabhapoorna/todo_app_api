@@ -1,12 +1,32 @@
 use axum::http::StatusCode;
-use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
 
 use crate::{
-    database::tasks::{self, Entity as Tasks, Model as TaskModel},
+    database::{
+        tasks::{self, Entity as Tasks, Model as TaskModel},
+        users::Model as UserModel,
+    },
+    routes::tasks::create_task_extractor::ValidateCreateTask,
     utilities::app_error::AppError,
 };
 
 use super::convert_active_to_model;
+
+pub async fn create_task(
+    task: ValidateCreateTask,
+    user: &UserModel,
+    db: &DatabaseConnection,
+) -> Result<TaskModel, AppError> {
+    let new_task = tasks::ActiveModel {
+        priority: Set(task.priority),
+        title: Set(task.title.unwrap()),
+        description: Set(task.description),
+        user_id: Set(Some(user.id)),
+        ..Default::default()
+    };
+
+    save_active_task(db, new_task).await
+}
 
 pub async fn save_active_task(
     db: &DatabaseConnection,
