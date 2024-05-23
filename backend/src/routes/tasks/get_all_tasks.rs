@@ -1,7 +1,10 @@
 use axum::{extract::State, Extension, Json};
 use sea_orm::DatabaseConnection;
 
-use crate::{database::users::Model as UserModel, queries::task_queries, routes::tasks::ResponseTask, utilities::app_error::AppError};
+use crate::{
+    database::users::Model as UserModel, queries::task_queries, routes::tasks::ResponseTask,
+    utilities::app_error::AppError,
+};
 
 use super::ResponseDataTasks;
 
@@ -17,9 +20,11 @@ pub async fn get_all_tasks(
             priority: db_task.priority,
             title: db_task.title,
             description: db_task.description,
-            completed_at: db_task.completed_at.map(|completed_at| completed_at.to_string()),
+            completed_at: db_task
+                .completed_at
+                .map(|completed_at| completed_at.to_string()),
         })
         .collect::<Vec<ResponseTask>>();
 
-    Ok(Json(ResponseDataTasks {data: tasks}))
+    Ok(Json(ResponseDataTasks { data: tasks }))
 }

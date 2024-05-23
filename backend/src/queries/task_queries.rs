@@ -28,6 +28,29 @@ pub async fn create_task(
     save_active_task(db, new_task).await
 }
 
+pub async fn find_task_by_id(
+    db: &DatabaseConnection,
+    id: i32,
+    user_id: i32,
+) -> Result<TaskModel, AppError> {
+    let task = Tasks::find_by_id(id)
+        .filter(tasks::Column::UserId.eq(Some(user_id)))
+        .one(db)
+        .await
+        .map_err(|error| {
+            eprintln!("Error getting task by id: {:?}", error);
+            AppError::new(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "There was an error getting task by id",
+            )
+        })?;
+
+    task.ok_or_else(|| {
+        eprintln!("Could not find task by id");
+        AppError::new(StatusCode::NOT_FOUND, "not found")
+    })
+}
+
 pub async fn save_active_task(
     db: &DatabaseConnection,
     task: tasks::ActiveModel,
@@ -51,15 +74,10 @@ pub async fn get_all_tasks(
         query = query.filter(tasks::Column::DeletedAt.is_null());
     }
 
-    query
-        .all(db)
-        .await
-        .map_err(|error| {
-            eprintln!("Error getting all tasks: {:?}", error);
-            AppError::new(
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Error getting all tasks")
-        })
+    query.all(db).await.map_err(|error| {
+        eprintln!("Error getting all tasks: {:?}", error);
+        AppError::new(StatusCode::INTERNAL_SERVER_ERROR, "Error getting all tasks")
+    })
 }
 
 pub async fn get_default_tasks(db: &DatabaseConnection) -> Result<Vec<TaskModel>, AppError> {
