@@ -13,7 +13,7 @@ use crate::utilities::app_error::AppError;
 pub struct ValidateCreateTask {
     #[validate(length(equal = 1, message = "Priority must be a single character"))]
     pub priority: Option<String>,
-    #[validate(required(message = "Missing task title"))]
+    #[validate(required(message = "missing task title"))]
     pub title: Option<String>,
     pub description: Option<String>,
 }
