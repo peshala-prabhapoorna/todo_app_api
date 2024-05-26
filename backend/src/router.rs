@@ -1,6 +1,6 @@
 use axum::{
     middleware::from_fn_with_state,
-    routing::{get, patch, post, put},
+    routing::{delete, get, patch, post, put},
     Router,
 };
 
@@ -10,7 +10,7 @@ use crate::{
     routes::{
         greeting::greeting,
         tasks::{
-            create_task::create_task, get_all_tasks::get_all_tasks, get_one_task::get_one_task, update_task::{mark_completed, mark_uncompleted, update_task},
+            create_task::create_task, delete_task::soft_delete_task, get_all_tasks::get_all_tasks, get_one_task::get_one_task, update_task::{mark_completed, mark_uncompleted, update_task}
         },
         users::{create_user::create_user, login::login, logout::logout},
     },
@@ -18,6 +18,7 @@ use crate::{
 
 pub async fn create_routes(app_satte: AppState) -> Router {
     Router::new()
+        .route("/api/v1/tasks/:task_id", delete(soft_delete_task))
         .route("/api/v1/tasks/:task_id", patch(update_task))
         .route("/api/v1/tasks/:task_id/uncompleted", put(mark_uncompleted))
         .route("/api/v1/tasks/:task_id/completed", put(mark_completed))
