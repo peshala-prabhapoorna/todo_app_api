@@ -8,7 +8,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=keyoarbcat
     ports:
-      - 5432:5432
+      - 5433:5432
     healthcheck:
       test: psql -U postgres -q -d postgres -c "SELECT 'ready';"
       interval: 10s

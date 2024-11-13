@@ -1,4 +1,4 @@
-use backend::{
+use todo_app_api::{
     app_state::AppState, fetch_environment_variable, run, utilities::token_wrapper::TokenWrapper,
 };
 use dotenvy::dotenv;
